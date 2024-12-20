@@ -12,8 +12,6 @@ public class YinYangGA {
 		int n = sc.nextInt();
         System.out.print("seed: ");
         int seed = sc.nextInt();
-        System.out.print("population size: ");
-        int popSize = sc.nextInt();
 
         //Proses
         //Membuat soal puzzle YinYang
@@ -26,11 +24,13 @@ public class YinYangGA {
         Population population = new Population();
         Individual fittest;
         int generationCount = 0;
+        
+        final int POPSIZE = 10;
         final int LIMIT = 1000;
-        population.initializePopulation(n, popSize, seed);
-
         final double ALPHA = 0.7; //weight untuk jumlah area 2x2
         final double BETA = 0.3;  //weight untuk jumlah connected components
+
+        population.initializePopulation(n, POPSIZE, seed);
         population.calculateFitness(ALPHA, BETA);
 
         //Proses GA
