@@ -29,7 +29,7 @@ public class PuzzleQuestion {
         Random r = new Random(seed);
         int[] num = new int[n*n]; //untuk menyimpan yin, yang, dan kosong
         
-        //0=kosong, 1=yin, 2=yang
+        //0=yang, 1=yin, 2=kosong
         //jumlah awal yin dan yang berdasarkan ukuran papan
         int countYin = n-1;
         int countYang = n-1;
@@ -41,6 +41,11 @@ public class PuzzleQuestion {
 
         //isi yang
         for(int i=countYin; i<countYin+countYang; i++){
+            num[i] = 0;
+        }
+
+        //kosong
+        for(int i=countYin+countYang; i<n*n; i++){
             num[i] = 2;
         }
         
