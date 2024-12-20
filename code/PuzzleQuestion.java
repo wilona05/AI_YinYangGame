@@ -2,25 +2,31 @@ package code;
 
 import java.util.*;
 
-public class Board {
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		int n = sc.nextInt();
-		int [][] board = randomBoard(new int[n][n], n);
-		printBoard(board);
-	}
+public class PuzzleQuestion {
+    private int n;
+	private int[][] puzzle;
+
+    public PuzzleQuestion(int n, int seed){
+        this.n = n;
+        this.puzzle = randomPuzzle(n, seed);
+    }
 	
-	public static void printBoard(int[][] board){
-	    for(int i=0; i <board.length; i++){
-	        for(int j=0; j <board.length; j++){
-	            System.out.print(board[i][j]+" ");
+    public int[][] getPuzzleQuestion(){
+        return this.puzzle;
+    }
+
+	public void printPuzzleQuestion(){
+	    for(int i=0; i <puzzle.length; i++){
+	        for(int j=0; j <puzzle.length; j++){
+	            System.out.print(puzzle[i][j]+" ");
     	    }
     	    System.out.println();
 	    }
 	}
 
-    public static int[][] randomBoard(int[][] board, int n){
-        Random r = new Random();
+    private int[][] randomPuzzle(int n, int seed){
+        int[][] puzzle = new int[n][n];
+        Random r = new Random(seed);
         int[] num = new int[n*n]; //untuk menyimpan yin, yang, dan kosong
         
         //0=kosong, 1=yin, 2=yang
@@ -46,15 +52,17 @@ public class Board {
             num[j] = temp;
         }
         
-        //isi board
+        //isi puzzle
         int idx = 0;
         for(int i=0; i <n; i++){
 	        for(int j=0; j <n; j++){
-	            board[i][j] = num[idx];
+	            puzzle[i][j] = num[idx];
 	            idx++;
     	    }
 	    }
 	    
-	    return board;
+	    return puzzle;
     }
+
+    
 }

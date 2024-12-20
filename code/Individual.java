@@ -1,0 +1,100 @@
+package code;
+
+import java.util.Random;
+
+public class Individual {
+    private int[][] board;
+    private PuzzleQuestion puzzle;
+    private int n;
+    private double fitness;
+    
+
+    public Individual(int n, int seed){
+        this.n = n;
+        this.board = fillBoardRandom(seed);
+    }
+	
+    //mengisi board dgn random
+    private int[][] fillBoardRandom(int seed) {
+        Random r = new Random(seed);
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'fillBoardRandom'");
+    }
+
+    //Hitung fitness board ini. Nilai fitness yang lebih rendah yang lebih baik
+    //alpha : weight untuk jumlah area 2x2
+    //beta  : weight untuk jumlah connected components
+    public double countFitness(double ALPHA, double BETA) {
+        int connectedComponents = countConnectedComponents();
+        if (connectedComponents==1){
+            return Double.MAX_VALUE;
+        }
+        int twoByTwo = countTwoByTwo();
+        double fitness = (ALPHA*twoByTwo) + (BETA*connectedComponents);
+        this.fitness = fitness;
+        return fitness;
+    }
+
+    public int[][] getBoard(){
+        return this.board;
+    }
+
+	public void printBoard(){
+	    for(int i=0; i<this.board.length; i++){
+	        for(int j=0; j<this.board.length; j++){
+	            System.out.print(board[i][j]+" ");
+    	    }
+    	    System.out.println();
+	    }
+	}
+
+    public int countTwoByTwo(){
+        int count = 0;
+        for(int i=0;i<n-1;i++){
+            for (int j=0;j<n-1;j++){
+                if (board[i][j]==board[i+1][j] && board[i][j]==board[i][j+1] && board[i][j]==board[i+1][j+1]){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public int countConnectedComponents(){
+        int count = 0;
+        boolean[][] visited = new boolean[n][n];
+
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(!visited[i][j]){
+                    dfs(visited, board[i][j], i, j);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private void dfs(boolean[][] visited, int currNum, int currRow, int currCol) {
+        visited[currRow][currCol] = true;
+
+        //bawah, atas, kanan, kiri
+        int[] rowMoves = {1, -1, 0, 0};
+        int[] colMoves = {0, 0, 1, -1};
+
+        int newRow, newCol;
+        for (int i=0;i<4;i++){
+            newRow = currRow+rowMoves[i];
+            newCol = currCol+colMoves[i];
+            //jika posisi baru tidak di luar papan dan belum pernah dikunjungi, dan angka pada posisi baru sama dengan angka sekarang 
+            if ((currRow+rowMoves[i]>=0) && (currRow+rowMoves[i]<n) && (currCol+colMoves[i]>=0) && (currCol+colMoves[i]<n) && (currNum == board[newRow][newCol]) && (!visited[newRow][newCol])){
+                dfs(visited, currNum, newRow, newCol);
+            }
+        }        
+    }
+
+    public double getFitness() {
+        return this.fitness;
+    }
+
+}
