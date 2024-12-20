@@ -18,12 +18,28 @@ public class Individual {
         this.n = n;
         this.board = fillBoardRandom(seed);
     }
+
+    public Individual(int n, int[][] board){
+        this.n = n;
+        this.board = board;
+    }
 	
     //mengisi board dgn random
     private int[][] fillBoardRandom(int seed) {
         Random r = new Random(seed);
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'fillBoardRandom'");
+        int[][] newBoard = new int[this.n][this.n];
+
+        for(int i=0; i<this.n; i++){
+            for(int j=0; j<this.n; j++){
+                boolean cur = r.nextBoolean();
+                if(cur == true){
+                    newBoard[i][j] = 0;
+                }else{
+                    newBoard[i][j] = 1;
+                }
+            }
+        }
+        return newBoard;
     }
 
     //Hitung fitness board ini. Nilai fitness yang lebih rendah yang lebih baik

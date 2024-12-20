@@ -10,6 +10,7 @@ public class Population {
     public void initializePopulation(int n, int popSize, int seed){
         this.popSize = popSize;
         this.seed = seed;
+        this.individuals = new Individual[popSize];
         //membuat Individual (board yang diisi 1 & 2 secara random) sebanyak popSize
         for (int i=0; i<popSize; i++){
             this.individuals[i] = new Individual(n, seed);  
@@ -34,4 +35,18 @@ public class Population {
         getFittest();
     }
 
+    public void addIndividual(Individual individual){
+        double worstFitness = Double.MIN_VALUE;
+        int worstIdx = -1;
+        for(int i=0; i<popSize; i++){
+            if(individual.getFitness() > worstFitness){
+                worstFitness = individuals[i].getFitness();
+                worstIdx = i;
+            }
+        }
+
+        if(worstIdx != -1){
+            individuals[worstIdx] = individual;
+        }
+    }
 }
