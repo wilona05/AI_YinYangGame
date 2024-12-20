@@ -60,5 +60,6 @@ public class YinYangGA {
         fittest = population.getFittest();
         fittest.printBoard();
         System.out.println("Fitness: " + fittest.getFitness());
+
 	}
 }
