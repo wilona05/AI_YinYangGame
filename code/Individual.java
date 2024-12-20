@@ -1,5 +1,10 @@
 package code;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 
 public class Individual {
@@ -55,13 +60,26 @@ public class Individual {
         return this.board;
     }
 
+
+    //https://www.geeksforgeeks.org/java-program-to-save-a-string-to-a-file/
 	public void printBoard(){
+        String filename = "output.txt";
+
+        String results = "";
 	    for(int i=0; i<this.board.length; i++){
 	        for(int j=0; j<this.board.length; j++){
-	            System.out.print(this.board[i][j]+" ");
+	            results += board[i][j]+" ";
     	    }
-    	    System.out.println();
+    	    results += "\n";
 	    }
+
+
+        try(FileWriter writer = new FileWriter(filename)){
+            writer.write(results);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
 	}
 
     public int countTwoByTwo(){
@@ -113,4 +131,6 @@ public class Individual {
         return this.fitness;
     }
 
+    
+    
 }
