@@ -8,23 +8,23 @@ import java.nio.file.Paths;
 import java.util.Random;
 
 public class Individual {
-    private int[][] board;
-    private PuzzleQuestion puzzle;
-    private int n;
-    private double fitness;
+    private int[][] board; //board yinyang
+    private int n; //ukuran board
+    private double fitness; //nilai fitness board
     
-
+    //constructor
     public Individual(int n, int seed){
         this.n = n;
         this.board = fillBoardRandom(seed);
     }
 
+    //constructor
     public Individual(int n, int[][] board){
         this.n = n;
         this.board = board;
     }
 	
-    //mengisi board dgn random
+    //method untuk mengisi board dgn random
     private int[][] fillBoardRandom(int seed) {
         Random r = new Random(seed);
         int[][] newBoard = new int[this.n][this.n];
@@ -33,16 +33,16 @@ public class Individual {
             for(int j=0; j<this.n; j++){
                 boolean cur = r.nextBoolean();
                 if(cur == true){
-                    newBoard[i][j] = 0;
-                }else{
                     newBoard[i][j] = 1;
+                }else{
+                    newBoard[i][j] = 2;
                 }
             }
         }
         return newBoard;
     }
 
-    //Hitung fitness board ini. Nilai fitness yang lebih rendah yang lebih baik
+    //method untuk menghitung fitness board. Nilai fitness yang lebih rendah = lebih baik
     //alpha : weight untuk jumlah area 2x2
     //beta  : weight untuk jumlah connected components
     public double countFitness(double ALPHA, double BETA) {
@@ -56,37 +56,40 @@ public class Individual {
         return fitness;
     }
 
+    //getter
     public int[][] getBoard(){
         return this.board;
     }
 
 
-    //https://www.geeksforgeeks.org/java-program-to-save-a-string-to-a-file/
+    //method untuk print board (https://www.geeksforgeeks.org/java-program-to-save-a-string-to-a-file/)
 	public void printBoard(){
         String filename = "output.txt";
-
-        String results = "";
+        String result = "";
 	    for(int i=0; i<this.board.length; i++){
 	        for(int j=0; j<this.board.length; j++){
-	            results += board[i][j]+" ";
+	            System.out.print(this.board[i][j]+" ");
+                result += board[i][j] + " ";
     	    }
-    	    results += "\n";
+    	    System.out.println();
+            result += "\n";
 	    }
 
-
+        //output ke file txt
         try(FileWriter writer = new FileWriter(filename)){
-            writer.write(results);
+            writer.write(result);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
 	}
 
+    //method untuk menghitung banyak area 2x2
     public int countTwoByTwo(){
         int count = 0;
+        boolean[][] visited = new boolean[n][n];
         for(int i=0;i<n-1;i++){
             for (int j=0;j<n-1;j++){
-                if (board[i][j]==board[i+1][j] && board[i][j]==board[i][j+1] && board[i][j]==board[i+1][j+1]){
+                if (!visited[i][j] && board[i][j]==board[i+1][j] && board[i][j]==board[i][j+1] && board[i][j]==board[i+1][j+1]){
                     count++;
                 }
             }
@@ -94,6 +97,15 @@ public class Individual {
         return count;
     }
 
+    //method untuk menandai area 2x2 yang sudah divisit
+    public void markVisited(boolean[][] visited, int i, int j){
+        visited[i][j] = true;
+        visited[i+1][j] = true;
+        visited[i][j+1] = true;
+        visited[i+1][j+1] = true;
+    }
+
+    //method untuk menghitung banyak connected graph
     public int countConnectedComponents(){
         int count = 0;
         boolean[][] visited = new boolean[n][n];
@@ -106,9 +118,11 @@ public class Individual {
                 }
             }
         }
+        if(count == 2) return 0; //solusi yang valid
         return count;
     }
 
+    //method untuk menelusuri board secara dfs
     private void dfs(boolean[][] visited, int currNum, int currRow, int currCol) {
         visited[currRow][currCol] = true;
 
@@ -127,10 +141,8 @@ public class Individual {
         }        
     }
 
+    //getter
     public double getFitness() {
         return this.fitness;
     }
-
-    
-    
 }
