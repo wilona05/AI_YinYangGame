@@ -19,7 +19,7 @@ public class YinYang {
 
         //GA
         //Inisialisasi
-        Population2 population = new Population2(populationSize, n, seed);
+        Population population = new Population(populationSize, n, seed);
         population.randomPopulation(); //generate random individual
         int generation = 0;
         boolean solutionFound = false;
@@ -49,7 +49,7 @@ public class YinYang {
             }
 
             //generasi lama (elitism 50%)
-            Population2 newPopulation = new Population2(populationSize, n, seed);
+            Population newPopulation = new Population(populationSize, n, seed);
             for(int i=0; i<populationSize/2; i++){
                 newPopulation.individuals.add(population.individuals.get(i));
             }

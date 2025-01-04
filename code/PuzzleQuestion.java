@@ -36,17 +36,17 @@ public class PuzzleQuestion {
         
         //isi yin
         for(int i=0; i<countYin; i++){
-            num[i] = 1;
+            num[i] = -1;
         }
 
         //isi yang
         for(int i=countYin; i<countYin+countYang; i++){
-            num[i] = 0;
+            num[i] = -2;
         }
 
         //kosong
         for(int i=countYin+countYang; i<n*n; i++){
-            num[i] = 2;
+            num[i] = 0;
         }
         
         //acak urutan angka
