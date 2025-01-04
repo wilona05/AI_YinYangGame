@@ -2,6 +2,9 @@ package code;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 
 public class Individual {
@@ -58,7 +61,8 @@ public class Individual {
         return this.board;
     }
 
-    //method untuk print board
+
+    //method untuk print board (https://www.geeksforgeeks.org/java-program-to-save-a-string-to-a-file/)
 	public void printBoard(){
         String filename = "output.txt";
         String result = "";
