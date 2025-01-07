@@ -11,6 +11,7 @@ public class YinYang {
     static final double alpha = 0.7; //weight untuk jumlah area 2x2
     static final double beta = 0.3;  //weight untuk jumlah connected components
     static final double mutationRate = 0.9;    //probabilitas untuk mutasi
+    static final double coolingRate = 0.99;
 
     public static void main(String[] args) {
         //Input
@@ -40,6 +41,8 @@ public class YinYang {
         int generation = 0;
         boolean solutionFound = false;
         Individual bestIndividual;
+        double initialTemp = 100.0; //suhu awal
+        double temperature = initialTemp;
 
         while(generation<maxGeneration && !solutionFound){
             //hitung ulang fitness setiap individual
@@ -66,8 +69,20 @@ public class YinYang {
 
             //generasi lama (elitism 50%)
             Population newPopulation = new Population(populationSize, n, rand, puzzleQuestion.getPuzzleQuestion());
-            for(int i=0; i<populationSize/2; i++){
-                newPopulation.individuals.add(population.individuals.get(i));
+            // for (int i = 0; i < populationSize / 2; i++) {
+            //     newPopulation.individuals.add(population.individuals.get(i));
+            // }
+            for(int i=0; i<populationSize; i++){
+                Individual individual = population.individuals.get(i);
+                double probability = Math.exp(-individual.getFitness()/temperature);
+
+                //pilih individu terbaik
+                if(rand.nextDouble() < probability || i==0){
+                    newPopulation.individuals.add(individual);
+                    if(newPopulation.individuals.size() >= populationSize/2){
+                        break;
+                    }
+                }
             }
 
             //generasi baru
@@ -87,7 +102,11 @@ public class YinYang {
                 //masukkan individu baru
                 newPopulation.individuals.add(offspring);
             }
-
+            temperature *= coolingRate;
+            if (temperature <0.1){
+                temperature = 0.1;
+            }
+            
             population = newPopulation;
             generation++;
         }
