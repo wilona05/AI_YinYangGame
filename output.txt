@@ -1,8 +1,8 @@
 1 1 1 -1 1 
 1 2 -2 2 1 
-1 -1 1 -2 2 
-1 2 1 1 2 
-1 2 2 2 -2 
+1 -1 1 -2 1 
+1 2 1 2 1 
+2 2 2 2 -2 
 
-Found in generation 385
+Found in generation 269
 Fitness: 0.0
