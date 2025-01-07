@@ -8,22 +8,24 @@ public class Population {
     private int maxSize; //banyak individu maks dalam populasi
     private int curPopulationSize; //banyak individu dalam populasi saat ini
     private int boardSize; //ukuran papan yinyang
-    private int seed; //untuk randomization
+    private Random rand; //untuk randomization
+    private int[][] puzzle;
 
-    //constructor
-    public Population(int maxSize, int boardSize, int seed){
+    //constructor papan soal random
+    public Population(int maxSize, int boardSize, Random rand, int[][] puzzle){
         this.individuals = new ArrayList<>();
         this.maxSize = maxSize;
         this.curPopulationSize = 0;
         this.boardSize = boardSize;
-        this.seed = seed;
+        this.rand = rand;
+        this.puzzle = puzzle;
     }
 
     //method untuk mengenerate populasi awal secara acak
     public void randomPopulation(){
         for(int i=0; i<this.maxSize; i++){
             if(this.curPopulationSize < this.maxSize){ 
-                this.individuals.add(new Individual(this.boardSize, this.seed+i));
+                this.individuals.add(new Individual(this.boardSize, this.rand, puzzle));
                 this.curPopulationSize++;
             }
         }
@@ -38,7 +40,7 @@ public class Population {
             totalFitness += 1.0 / (individual.getFitness() + 1); 
         }
 
-        double random = Math.random() * totalFitness;
+        double random = rand.nextDouble() * totalFitness;
         double cumulativeFitness = 0;
 
         //pilih individu
@@ -54,8 +56,7 @@ public class Population {
     //method untuk menggabungkan 2 individu, kemudian menghasilkan individu baru
     public Individual crossover(Individual parent1, Individual parent2){
         int n = parent1.getBoard().length;
-        Random random = new Random();
-        int crossoverPoint = random.nextInt(n);
+        int crossoverPoint = rand.nextInt(n);
 
         int[][] offspringBoard = new int[n][n];
         for(int i=0; i<n; i++){
@@ -67,19 +68,25 @@ public class Population {
                 }
             }
         }
-        return new Individual(n, offspringBoard);
+        return new Individual(n, offspringBoard, puzzle);
     }
 
     //method untuk perubahan acak gen individu (meningkatkan keberagaman individu)
     public void mutate(Individual individual){
-        Random random = new Random();
-        int i = random.nextInt(individual.getBoard().length);
-        int j = random.nextInt(individual.getBoard().length);
+        int i, j;
+        int[][] board = individual.getBoard();
+        //randomize posisi (row & column) yang akan dimutasi
+        //jika pada posisi itu adalah -1 atau -2 (fixed yin/yang), maka randomize lagi 
+        do{
+            i = rand.nextInt(board.length);
+            j = rand.nextInt(board[0].length);
+        } while (board[i][j] == -1 || board[i][j] == -2);
        
-        if(random.nextBoolean()){
-            individual.getBoard()[i][j] = 1;
+        //mutasi (flip yin->yang, atau yang->yin)
+        if(board[i][j] == 1){
+            board[i][j] = 2;
         }else{
-            individual.getBoard()[i][j] = 2;
+            board[i][j] = 1;
         }
     }
 }
