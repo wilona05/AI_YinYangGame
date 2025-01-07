@@ -2,40 +2,43 @@ package code;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Random;
 
 public class Individual {
     private int[][] board; //board yinyang
     private int n; //ukuran board
     private double fitness; //nilai fitness board
-    
-    //constructor
-    public Individual(int n, int seed){
+    private int[][] puzzle;
+    private Random rand;
+
+    //constructor dengan board random(untuk inisialisasi populasi)
+    public Individual(int n, Random rand, int[][] puzzle){
         this.n = n;
-        this.board = fillBoardRandom(seed);
+        this.puzzle = puzzle;
+        this.rand = rand;
+        this.board = fillBoardRandom();
     }
 
-    //constructor
-    public Individual(int n, int[][] board){
+    //constructor dengan input board
+    public Individual(int n, int[][] board, int[][] puzzle){
         this.n = n;
         this.board = board;
+        this.puzzle = puzzle;
     }
 	
     //method untuk mengisi board dgn random
-    private int[][] fillBoardRandom(int seed) {
-        Random r = new Random(seed);
+    private int[][] fillBoardRandom() {
         int[][] newBoard = new int[this.n][this.n];
 
         for(int i=0; i<this.n; i++){
             for(int j=0; j<this.n; j++){
-                boolean cur = r.nextBoolean();
-                if(cur == true){
-                    newBoard[i][j] = 1;
-                }else{
-                    newBoard[i][j] = 2;
+                //jika posisi ini di soal adalah '-1' atau -2 (fixed yin/yang), copy dari soal
+                if (puzzle[i][j] == -1 || puzzle[i][j] == -2) {
+                    newBoard[i][j] = puzzle[i][j];
+                } 
+                //jika posisi ini di soal adalah '0' (kosong), maka randomize angka pada posisi ini menjadi 1 atau 2 (changeable yin/yang)
+                else {
+                    newBoard[i][j] = rand.nextBoolean() ? 1 : 2;
                 }
             }
         }
@@ -63,7 +66,7 @@ public class Individual {
 
 
     //method untuk print board (https://www.geeksforgeeks.org/java-program-to-save-a-string-to-a-file/)
-	public void printBoard(){
+	public void printBoard(int generation, double fitness){
         String filename = "output.txt";
         String result = "";
 	    for(int i=0; i<this.board.length; i++){
@@ -73,8 +76,10 @@ public class Individual {
     	    }
     	    System.out.println();
             result += "\n";
-	    }
 
+	    }
+        result += "\nFound in generation " + generation;
+        result += "\nFitness: " + fitness;
         //output ke file txt
         try(FileWriter writer = new FileWriter(filename)){
             writer.write(result);
@@ -86,10 +91,13 @@ public class Individual {
     //method untuk menghitung banyak area 2x2
     public int countTwoByTwo(){
         int count = 0;
-        boolean[][] visited = new boolean[n][n];
         for(int i=0;i<n-1;i++){
             for (int j=0;j<n-1;j++){
-                if (!visited[i][j] && board[i][j]==board[i+1][j] && board[i][j]==board[i][j+1] && board[i][j]==board[i+1][j+1]){
+                int topLeft = Math.abs(board[i][j]);
+                int topRight = Math.abs(board[i][j+1]);
+                int botLeft = Math.abs(board[i+1][j]);
+                int botRight = Math.abs(board[i+1][j+1]);
+                if (topLeft==topRight && topLeft==botLeft && topLeft==botRight){
                     count++;
                 }
             }
@@ -134,8 +142,9 @@ public class Individual {
         for (int i=0;i<4;i++){
             newRow = currRow+rowMoves[i];
             newCol = currCol+colMoves[i];
-            //jika posisi baru tidak di luar papan dan belum pernah dikunjungi, dan angka pada posisi baru sama dengan angka sekarang 
-            if ((currRow+rowMoves[i]>=0) && (currRow+rowMoves[i]<n) && (currCol+colMoves[i]>=0) && (currCol+colMoves[i]<n) && (currNum == board[newRow][newCol]) && (!visited[newRow][newCol])){
+            //jika posisi baru tidak di luar papan dan belum pernah dikunjungi, 
+            //dan angka pada posisi baru sama dengan angka sekarang (fixed & changeable dianggap sama)
+            if ((currRow+rowMoves[i]>=0) && (currRow+rowMoves[i]<n) && (currCol+colMoves[i]>=0) && (currCol+colMoves[i]<n) && (currNum == board[newRow][newCol] || currNum*-1 == board[newRow][newCol]) && (!visited[newRow][newCol])){
                 dfs(visited, currNum, newRow, newCol);
             }
         }        

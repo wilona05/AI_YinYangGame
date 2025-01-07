@@ -1,6 +1,8 @@
 package code;
 
+import java.io.FileReader;
 import java.util.Collections;
+import java.util.Random;
 import java.util.Scanner;
 
 public class YinYang {
@@ -8,19 +10,33 @@ public class YinYang {
     static final int maxGeneration = 1000; //maksimal generasi
     static final double alpha = 0.7; //weight untuk jumlah area 2x2
     static final double beta = 0.3;  //weight untuk jumlah connected components
-    
+    static final double mutationRate = 0.9;    //probabilitas untuk mutasi
+
     public static void main(String[] args) {
-        //input
-		Scanner sc = new Scanner(System.in);
-        System.out.print("n: ");
-		int n = sc.nextInt(); //ukuran papan nxn
-        System.out.print("seed: ");
-        int seed = sc.nextInt(); //untuk urutan angka acak
+        //Input
+        int n = 1, seed = 1;
+        PuzzleQuestion puzzleQuestion = null;
+        try (Scanner sc = new Scanner(new FileReader("input.txt"))) {
+            n = sc.nextInt(); //ukuran papan nxn            
+            seed = sc.nextInt(); //untuk urutan angka acak
+        
+            // input papan puzzle
+            int[][] puzzleInput = new int[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    puzzleInput[i][j] = sc.nextInt();
+                }
+            }
+            puzzleQuestion = new PuzzleQuestion(puzzleInput);        
+        } catch (Exception e) {
+            System.err.println("Error membaca input file: " + e.getMessage());
+        }
 
         //GA
-        //Inisialisasi
-        Population population = new Population(populationSize, n, seed);
-        population.randomPopulation(); //generate random individual
+        //Inisialisasi Populasi
+        Random rand = new Random(seed);
+        Population population = new Population(populationSize, n, rand, puzzleQuestion.getPuzzleQuestion());
+        population.randomPopulation(); //generate populasi awal yang berisi individual random
         int generation = 0;
         boolean solutionFound = false;
         Individual bestIndividual;
@@ -39,7 +55,7 @@ public class YinYang {
             bestIndividual = population.individuals.get(0);
             System.out.println("Generation: " + generation);
             System.out.println("Fitness: " + bestIndividual.getFitness());
-            bestIndividual.printBoard();
+            bestIndividual.printBoard(generation, bestIndividual.getFitness());
 
             //cek apakah bestIndividual adalah solusi yang valid
             if(bestIndividual.getFitness() == 0){
@@ -49,7 +65,7 @@ public class YinYang {
             }
 
             //generasi lama (elitism 50%)
-            Population newPopulation = new Population(populationSize, n, seed);
+            Population newPopulation = new Population(populationSize, n, rand, puzzleQuestion.getPuzzleQuestion());
             for(int i=0; i<populationSize/2; i++){
                 newPopulation.individuals.add(population.individuals.get(i));
             }
@@ -65,8 +81,9 @@ public class YinYang {
                 offspring.countFitness(alpha, beta); //hitung fitness
     
                 //mutasi
-                newPopulation.mutate(offspring);
-                
+                if (rand.nextDouble() < mutationRate) { //Math.random() mengembalikan angka di antara 0 sampai 1
+                    newPopulation.mutate(offspring);
+                }
                 //masukkan individu baru
                 newPopulation.individuals.add(offspring);
             }
