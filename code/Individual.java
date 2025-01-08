@@ -49,6 +49,7 @@ public class Individual {
     //method untuk menghitung fitness board. Nilai fitness yang lebih rendah = lebih baik
     //alpha : weight untuk jumlah area 2x2
     //beta  : weight untuk jumlah connected components
+    //(https://www.geeksforgeeks.org/number-of-connected-components-in-a-2-d-matrix-of-strings/)
     public double countFitness(double ALPHA, double BETA) {
         int connectedComponents = countConnectedComponents();
         if (connectedComponents==1){
