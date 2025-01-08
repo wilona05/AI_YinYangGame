@@ -50,13 +50,13 @@ public class Individual {
     //alpha : weight untuk jumlah area 2x2
     //beta  : weight untuk jumlah connected components
     //(https://www.geeksforgeeks.org/number-of-connected-components-in-a-2-d-matrix-of-strings/)
-    public double countFitness(double ALPHA, double BETA) {
+    public double countFitness(double alpha, double beta) {
         int connectedComponents = countConnectedComponents();
         if (connectedComponents==1){
             return Double.MAX_VALUE;
         }
         int twoByTwo = countTwoByTwo();
-        double fitness = (ALPHA*twoByTwo) + (BETA*connectedComponents);
+        double fitness = (alpha*twoByTwo) + (beta*connectedComponents);
         this.fitness = fitness;
         return fitness;
     }
