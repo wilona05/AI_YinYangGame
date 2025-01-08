@@ -9,23 +9,23 @@ public class Population {
     private int curPopulationSize; //banyak individu dalam populasi saat ini
     private int boardSize; //ukuran papan yinyang
     private Random rand; //untuk randomization
-    private int[][] puzzle;
+    private PuzzleQuestion puzzleQuestion;
 
     //constructor papan soal random
-    public Population(int maxSize, int boardSize, Random rand, int[][] puzzle){
+    public Population(int maxSize, int boardSize, Random rand, PuzzleQuestion puzzleQuestion){
         this.individuals = new ArrayList<>();
         this.maxSize = maxSize;
         this.curPopulationSize = 0;
         this.boardSize = boardSize;
         this.rand = rand;
-        this.puzzle = puzzle;
+        this.puzzleQuestion = puzzleQuestion;
     }
 
     //method untuk mengenerate populasi awal secara acak
     public void randomPopulation(){
         for(int i=0; i<this.maxSize; i++){
             if(this.curPopulationSize < this.maxSize){ 
-                this.individuals.add(new Individual(this.boardSize, this.rand, puzzle));
+                this.individuals.add(new Individual(this.boardSize, this.rand, puzzleQuestion));
                 this.curPopulationSize++;
             }
         }
@@ -68,7 +68,7 @@ public class Population {
                 }
             }
         }
-        return new Individual(n, offspringBoard, puzzle);
+        return new Individual(n, offspringBoard, puzzleQuestion);
     }
 
     //method untuk perubahan acak gen individu (meningkatkan keberagaman individu)

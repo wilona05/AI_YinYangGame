@@ -36,7 +36,7 @@ public class YinYang {
         //GA
         //Inisialisasi Populasi
         Random rand = new Random(seed);
-        Population population = new Population(populationSize, n, rand, puzzleQuestion.getPuzzleQuestion());
+        Population population = new Population(populationSize, n, rand, puzzleQuestion);
         population.randomPopulation(); //generate populasi awal yang berisi individual random
         int generation = 0;
         boolean solutionFound = false;
@@ -68,7 +68,7 @@ public class YinYang {
             }
 
             //generasi lama (elitism 50%)
-            Population newPopulation = new Population(populationSize, n, rand, puzzleQuestion.getPuzzleQuestion());
+            Population newPopulation = new Population(populationSize, n, rand, puzzleQuestion);
             // for (int i = 0; i < populationSize / 2; i++) {
             //     newPopulation.individuals.add(population.individuals.get(i));
             // }
