@@ -8,27 +8,28 @@ public class Individual {
     private int[][] board; //board yinyang
     private int n; //ukuran board
     private double fitness; //nilai fitness board
-    private int[][] puzzle;
+    private PuzzleQuestion puzzleQuestion;
     private Random rand;
 
     //constructor dengan board random(untuk inisialisasi populasi)
-    public Individual(int n, Random rand, int[][] puzzle){
+    public Individual(int n, Random rand, PuzzleQuestion puzzleQuestion){
         this.n = n;
-        this.puzzle = puzzle;
+        this.puzzleQuestion = puzzleQuestion;
         this.rand = rand;
         this.board = fillBoardRandom();
     }
 
     //constructor dengan input board
-    public Individual(int n, int[][] board, int[][] puzzle){
+    public Individual(int n, int[][] board, PuzzleQuestion puzzleQuestion){
         this.n = n;
         this.board = board;
-        this.puzzle = puzzle;
+        this.puzzleQuestion = puzzleQuestion;
     }
 	
     //method untuk mengisi board dgn random
     private int[][] fillBoardRandom() {
         int[][] newBoard = new int[this.n][this.n];
+        int[][] puzzle = puzzleQuestion.getPuzzleQuestion();
 
         for(int i=0; i<this.n; i++){
             for(int j=0; j<this.n; j++){
@@ -48,6 +49,7 @@ public class Individual {
     //method untuk menghitung fitness board. Nilai fitness yang lebih rendah = lebih baik
     //alpha : weight untuk jumlah area 2x2
     //beta  : weight untuk jumlah connected components
+    //(https://www.geeksforgeeks.org/number-of-connected-components-in-a-2-d-matrix-of-strings/)
     public double countFitness(double ALPHA, double BETA) {
         int connectedComponents = countConnectedComponents();
         if (connectedComponents==1){
@@ -78,8 +80,15 @@ public class Individual {
             result += "\n";
 
 	    }
-        result += "\nFound in generation " + generation;
-        result += "\nFitness: " + fitness;
+        if (fitness > 0){
+            result += "\nNo solution found within the maximum generations.\nGeneration: " + generation;
+            result += "\nFitness: " + fitness;
+        }
+        else{
+            result += "\nSolution found.\nGeneration: " + generation;
+            result += "\nFitness: " + fitness;
+        }
+        
         //output ke file txt
         try(FileWriter writer = new FileWriter(filename)){
             writer.write(result);
