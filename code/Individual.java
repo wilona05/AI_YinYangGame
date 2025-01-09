@@ -8,7 +8,7 @@ public class Individual {
     private int[][] board; //board yinyang
     private int n; //ukuran board
     private double fitness; //nilai fitness board
-    private PuzzleQuestion puzzleQuestion;
+    private PuzzleQuestion puzzleQuestion; //board yinyang awal (soal yang akan disolve)
     private Random rand;
 
     //constructor dengan board random(untuk inisialisasi populasi)
@@ -51,12 +51,14 @@ public class Individual {
     //beta  : weight untuk jumlah connected components
     //(https://www.geeksforgeeks.org/number-of-connected-components-in-a-2-d-matrix-of-strings/)
     public double countFitness(double alpha, double beta) {
-        int connectedComponents = countConnectedComponents();
-        if (connectedComponents==1){
+        int connectedComponents = countConnectedComponents(); //hitung connected components 
+        if (connectedComponents==1){ //solusi terburuk
             return Double.MAX_VALUE;
-        }
-        int twoByTwo = countTwoByTwo();
-        double fitness = (alpha*twoByTwo) + (beta*connectedComponents);
+        }else if(connectedComponents == 2){ //solusi terbaik
+            return 0;
+        } 
+        int twoByTwo = countTwoByTwo(); //hitung banyak area 2x2
+        double fitness = (alpha*twoByTwo) + (beta*connectedComponents); //hitung fitness
         this.fitness = fitness;
         return fitness;
     }
@@ -71,20 +73,22 @@ public class Individual {
 	public void printBoard(int generation, double fitness){
         String filename = "output.txt";
         String result = "";
+        String format = "";
 	    for(int i=0; i<this.board.length; i++){
 	        for(int j=0; j<this.board.length; j++){
-	            System.out.print(this.board[i][j]+" ");
-                result += board[i][j] + " ";
+	            System.out.printf("%4d", this.board[i][j]);
+                format = String.format("%4d", this.board[i][j]);
+                result += format;
     	    }
     	    System.out.println();
             result += "\n";
-
 	    }
-        if (fitness > 0){
+
+        if (fitness > 0){ //solusi valid tidak ditemukan, output solusi terbaik
             result += "\nNo solution found within the maximum generations.\nGeneration: " + generation;
             result += "\nFitness: " + fitness;
         }
-        else{
+        else{ //solusi valid ditemukan
             result += "\nSolution found.\nGeneration: " + generation;
             result += "\nFitness: " + fitness;
         }
@@ -114,14 +118,6 @@ public class Individual {
         return count;
     }
 
-    //method untuk menandai area 2x2 yang sudah divisit
-    public void markVisited(boolean[][] visited, int i, int j){
-        visited[i][j] = true;
-        visited[i+1][j] = true;
-        visited[i][j+1] = true;
-        visited[i+1][j+1] = true;
-    }
-
     //method untuk menghitung banyak connected graph
     public int countConnectedComponents(){
         int count = 0;
@@ -135,7 +131,6 @@ public class Individual {
                 }
             }
         }
-        if(count == 2) return 0; //solusi yang valid
         return count;
     }
 
