@@ -32,29 +32,38 @@ public class Population {
     }
 
     //method seleksi menggunakan roulette wheel
-    public Individual selectParent(){
+    public Individual[] selectParent(){
+        Individual[] parents = new Individual[2]; //menyimpan hasil seleksi
+        
         double totalFitness = 0;
-
         //hitung total fitness (meminimalkan: fitness makin kecil --> peluang makin besar)
         for(Individual individual : this.individuals){
             totalFitness += 1.0 / (individual.getFitness() + 1); 
         }
 
-        double random = rand.nextDouble() * totalFitness; //angka acak [0, totalFitness)
-        double cumulativeFitness = 0;
-
-        //pilih individu yang cumlativeFitnessnya melebihi angka random
+        //hitung probabilitas seleksi untuk setiap individu
         for(Individual individual : this.individuals){
-            cumulativeFitness += 1.0 / (individual.getFitness() + 1);
-            if(cumulativeFitness >= random){
-                return individual;
-            }
+            individual.parentProbability = (1.0 / (individual.getFitness() + 1)) / totalFitness;
         }
 
-        return this.individuals.get(this.individuals.size() - 1);  //fallback
+        //pilih 2 individu
+        for(int i=0; i<2; i++){
+            int j = 0;
+            double prob = rand.nextDouble(); //angka acak 
+            double cumulativeProb = 0.0;
+
+           // Pilih individu yang cumulativeProb >= prob
+            while (cumulativeProb < prob && j < this.individuals.size()) {
+                cumulativeProb += this.individuals.get(j).parentProbability;
+                j++;
+            }
+        
+            parents[i] = this.individuals.get(j-1); //simpan individu yang terpilih
+        }
+        return parents;
     }
 
-    //method untuk menggabungkan 2 individu, kemudian menghasilkan individu baru (one-point crossover)
+    //method untuk menggabungkan 2 individu, kemudian menghasilkan individu baru (single-point crossover)
     public Individual crossover(Individual parent1, Individual parent2){
         int n = parent1.getBoard().length; //ukuran papan
         int crossoverPoint = rand.nextInt(n); //titik crossover
@@ -69,25 +78,6 @@ public class Population {
                 }
             }
         }
-        return new Individual(n, offspringBoard, puzzleQuestion); //kembalikan individu baru dengan board hasil crossover
-    }
-
-    //method untuk perubahan acak gen individu (meningkatkan keberagaman individu)
-    public void mutate(Individual individual){
-        int i, j;
-        int[][] board = individual.getBoard();
-        //randomize posisi (row & column) yang akan dimutasi
-        //jika pada posisi itu adalah -1 atau -2 (fixed yin/yang), maka randomize lagi 
-        do{
-            i = rand.nextInt(board.length);
-            j = rand.nextInt(board[0].length);
-        } while (board[i][j] == -1 || board[i][j] == -2);
-       
-        //mutasi (flip yin->yang, atau yang->yin)
-        if(board[i][j] == 1){
-            board[i][j] = 2;
-        }else{
-            board[i][j] = 1;
-        }
+        return new Individual(n, rand, puzzleQuestion, offspringBoard); //kembalikan individu baru dengan board hasil crossover
     }
 }

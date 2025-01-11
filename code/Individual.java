@@ -10,6 +10,7 @@ public class Individual {
     private double fitness; //nilai fitness board
     private PuzzleQuestion puzzleQuestion; //board yinyang awal (soal yang akan disolve)
     private Random rand;
+    public double parentProbability; //probabilitas parent
 
     //constructor dengan board random(untuk inisialisasi populasi)
     public Individual(int n, Random rand, PuzzleQuestion puzzleQuestion){
@@ -17,13 +18,15 @@ public class Individual {
         this.puzzleQuestion = puzzleQuestion;
         this.rand = rand;
         this.board = fillBoardRandom();
+        this.parentProbability = 0;
     }
 
     //constructor dengan input board
-    public Individual(int n, int[][] board, PuzzleQuestion puzzleQuestion){
+    public Individual(int n, Random rand, PuzzleQuestion puzzleQuestion, int[][] board){
         this.n = n;
         this.board = board;
         this.puzzleQuestion = puzzleQuestion;
+        this.rand = rand;
     }
 	
     //method untuk mengisi board dgn random
@@ -54,8 +57,8 @@ public class Individual {
         int connectedComponents = countConnectedComponents(); //hitung connected components 
         if (connectedComponents==1){ //solusi terburuk
             return Double.MAX_VALUE;
-        }else if(connectedComponents == 2){ //solusi terbaik
-            return 0;
+        }else if(connectedComponents == 2){ //connectedComponent yang tepat
+            connectedComponents = 0;
         } 
         int twoByTwo = countTwoByTwo(); //hitung banyak area 2x2
         double fitness = (alpha*twoByTwo) + (beta*connectedComponents); //hitung fitness
@@ -157,5 +160,23 @@ public class Individual {
     //getter
     public double getFitness() {
         return this.fitness;
+    }
+
+    //method untuk perubahan acak gen individu (meningkatkan keberagaman individu)
+    public void mutate(){
+        int i, j;
+        //randomize posisi (row & column) yang akan dimutasi
+        //jika pada posisi itu adalah -1 atau -2 (fixed yin/yang), maka randomize lagi 
+        do{
+            i = rand.nextInt(this.board.length);
+            j = rand.nextInt(this.board[0].length);
+        } while (this.board[i][j] == -1 || this.board[i][j] == -2);
+       
+        //mutasi (flip yin->yang, atau yang->yin)
+        if(this.board[i][j] == 1){
+            this.board[i][j] = 2;
+        }else{
+            this.board[i][j] = 1;
+        }
     }
 }

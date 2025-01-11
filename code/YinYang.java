@@ -49,13 +49,13 @@ public class YinYang {
             //hitung ulang fitness setiap individual
             for(Individual individual : population.individuals){
                 individual.countFitness(ALPHA, BETA);
-                System.out.print(individual.getFitness()+" ");
+                // System.out.print(individual.getFitness()+" ");
             }
             System.out.println();
-
+            
             //mengurutkan individu dalam populasi berdasarkan fitness (menaik)
             Collections.sort(population.individuals, (i1, i2) -> Double.compare(i1.getFitness(), i2.getFitness()));
-
+            
             //tampilkan individu terbaik dalam populasi
             bestIndividual = population.individuals.get(0);
             System.out.println("Generation: " + generation);
@@ -91,16 +91,15 @@ public class YinYang {
             //generasi baru
             while(newPopulation.individuals.size() < POP_SIZE){
                 //selection
-                Individual parent1 = newPopulation.selectParent();
-                Individual parent2 = newPopulation.selectParent();
+                Individual[] parents = newPopulation.selectParent();
                 
                 //crossover
-                Individual offspring = newPopulation.crossover(parent1, parent2);
+                Individual offspring = newPopulation.crossover(parents[0], parents[1]);
                 offspring.countFitness(ALPHA, BETA); //hitung fitness
     
                 //mutasi
                 if (rand.nextDouble() < MUTATION_RATE) { //Math.random() mengembalikan angka di antara 0 sampai 1
-                    newPopulation.mutate(offspring);
+                    offspring.mutate();
                 }
                 //masukkan individu baru
                 newPopulation.individuals.add(offspring);
