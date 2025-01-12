@@ -1,51 +1,42 @@
 package code;
 
-import java.io.FileReader;
 import java.util.Collections;
 import java.util.Random;
-import java.util.Scanner;
 
 public class YinYang {
-    static final int POP_SIZE = 10; //ukuran populasi
-    static final int MAX_GEN = 1000; //maksimal generasi
     static final double ALPHA = 0.7; //weight untuk jumlah area 2x2
     static final double BETA = 0.3;  //weight untuk jumlah connected components
-    static final double MUTATION_RATE = 0.9; //probabilitas untuk mutasi
-    static final double COOLING_RATE = 0.99; //kontrol penurunan suhu
+    public int popSize = 10; //ukuran populasi
+    public int maxGen = 1000; //maksimal generasi
+    public double mutationRate = 0.9; //probabilitas untuk mutasi
+    public double coolingRate = 0.99; //kontrol penurunan suhu
+    Random rand;
+    public int n;
+    public PuzzleQuestion puzzleQuestion;
 
-    public static void main(String[] args) {
-        //Input
-        int n = 1, seed = 1;
-        PuzzleQuestion puzzleQuestion = null;
-        try (Scanner sc = new Scanner(new FileReader("input.txt"))) {
-            n = sc.nextInt(); //ukuran papan nxn            
-            seed = sc.nextInt(); //untuk urutan angka acak
-        
-            // input papan puzzle
-            int[][] puzzleInput = new int[n][n];
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    puzzleInput[i][j] = sc.nextInt();
-                }
-            }
-            puzzleQuestion = new PuzzleQuestion(puzzleInput);        
-        } catch (Exception e) {
-            System.err.println("Error membaca input file: " + e.getMessage());
-        }
+    public YinYang(int popsize, int maxGen, double mutationRate, double coolingRate, Random rand, int n, PuzzleQuestion puzzleQuestion){
+        this.popSize = popsize;
+        this.maxGen = maxGen;
+        this.mutationRate = mutationRate;
+        this.coolingRate = coolingRate;
+        this.rand = rand;
+        this.n = n;
+        this.puzzleQuestion = puzzleQuestion;
+    }
 
+    public Individual runGA(){
         //GA
         //Inisialisasi Populasi
-        Random rand = new Random(seed);
-        Population population = new Population(POP_SIZE, n, rand, puzzleQuestion);
+        Population population = new Population(popSize, n, rand, puzzleQuestion);
         population.randomPopulation(); //generate populasi awal yang berisi individual random
 
         int generation = 0; //banyak generasi saat ini
         boolean solutionFound = false; //penanda apakah solusi valid sudah ditemukan
-        Individual bestIndividual; //individual dengan fitness terbaik (terendah)
+        Individual bestIndividual = null; //individual dengan fitness terbaik (terendah)
         double initialTemp = 100.0; //suhu awal
         double temperature = initialTemp; //nilai suhu yang akan menurun tiap iterasi 
 
-        while(generation<MAX_GEN && !solutionFound){
+        while(generation<maxGen && !solutionFound){
             //hitung ulang fitness setiap individual
             for(Individual individual : population.individuals){
                 individual.countFitness(ALPHA, BETA);
@@ -67,29 +58,29 @@ public class YinYang {
             if(bestIndividual.getFitness() == 0){
                 System.out.println("Solution found in generation " + generation);
                 solutionFound = true;
-                break;
+                return bestIndividual;
             }
 
             //generasi lama
-            Population newPopulation = new Population(POP_SIZE, n, rand, puzzleQuestion);
+            Population newPopulation = new Population(popSize, n, rand, puzzleQuestion);
             // for (int i = 0; i < POP_SIZE / 2; i++) { //elitism 50%
             //     newPopulation.individuals.add(population.individuals.get(i));
             // }
-            for(int i=0; i<POP_SIZE; i++){
+            for(int i=0; i<popSize; i++){
                 Individual individual = population.individuals.get(i);
                 double probability = Math.exp(-individual.getFitness()/temperature);
 
                 //pilih individu terbaik
                 if(rand.nextDouble() < probability || i==0){
                     newPopulation.individuals.add(individual);
-                    if(newPopulation.individuals.size() >= POP_SIZE/2){
+                    if(newPopulation.individuals.size() >= popSize/2){
                         break;
                     }
                 }
             }
 
             //generasi baru
-            while(newPopulation.individuals.size() < POP_SIZE){
+            while(newPopulation.individuals.size() < popSize){
                 //selection
                 Individual[] parents = newPopulation.selectParent();
                 
@@ -98,7 +89,7 @@ public class YinYang {
                 offspring.countFitness(ALPHA, BETA); //hitung fitness
     
                 //mutasi
-                if (rand.nextDouble() < MUTATION_RATE) { //Math.random() mengembalikan angka di antara 0 sampai 1
+                if (rand.nextDouble() < mutationRate) { //Math.random() mengembalikan angka di antara 0 sampai 1
                     offspring.mutate();
                 }
                 //masukkan individu baru
@@ -106,7 +97,7 @@ public class YinYang {
             }
 
             //turunkan suhu
-            temperature *= COOLING_RATE;
+            temperature *= coolingRate;
             if (temperature < 0.1){
                 temperature = 0.1;
             }
@@ -117,6 +108,7 @@ public class YinYang {
 
         if(!solutionFound) { //solusi valid tidak ditemukan
             System.out.println("No solution found within the maximum generations.");
-        }
+        }   
+        return bestIndividual;
     }
 }
