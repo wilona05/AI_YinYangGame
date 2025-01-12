@@ -74,18 +74,26 @@ public class Individual {
     }
 
     // method untuk print board
-    // (https://www.geeksforgeeks.org/java-program-to-save-a-string-to-a-file/)
     public void printBoard(int generation, double fitness) {
+        for (int i = 0; i < this.board.length; i++) {
+            for (int j = 0; j < this.board.length; j++) {
+                System.out.printf("%4d", this.board[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    //method untuk menyimpan hasil di file teks
+    // (https://www.geeksforgeeks.org/java-program-to-save-a-string-to-a-file/)
+    public void saveResult(int generation, double fitness){
         String filename = "output.txt";
         String result = "";
         String format = "";
         for (int i = 0; i < this.board.length; i++) {
             for (int j = 0; j < this.board.length; j++) {
-                System.out.printf("%4d", this.board[i][j]);
                 format = String.format("%4d", this.board[i][j]);
                 result += format;
             }
-            System.out.println();
             result += "\n";
         }
 

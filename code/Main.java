@@ -42,23 +42,14 @@ public class Main {
                     for (int j = 0; j < n; j++) {
                         if (inputSc.hasNextInt()) {
                             puzzleInput[i][j] = inputSc.nextInt();
-                        } else {
-                            throw new IllegalArgumentException("Input file tidak memiliki data cukup untuk matriks.");
                         }
                     }
                 }
-                System.out.println("matrix berhasil dibaca");
                 puzzleQuestion = new PuzzleQuestion(puzzleInput);
                 Random rand = new Random(seed);
                 // ga
                 YinYang ga = new YinYang(popSize, maxGen, mutationRate, coolingRate, rand, n, puzzleQuestion);
                 Individual res = ga.runGA();
-                if (res == null) {
-                    System.err.println("Algoritma tidak menemukan solusi.");
-                } else {
-                    System.out.println("Hasil individu: " + res.getFitness());
-                }
-
             }
         } catch (Exception e) {
             System.err.println("Error membaca input file: " + e.getMessage());
