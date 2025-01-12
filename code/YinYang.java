@@ -49,15 +49,16 @@ public class YinYang {
             
             //tampilkan individu terbaik dalam populasi
             bestIndividual = population.individuals.get(0);
-            System.out.println("Generation: " + generation);
-            System.out.println("Fitness: " + bestIndividual.getFitness());
-            bestIndividual.printBoard(generation, bestIndividual.getFitness());
-            System.out.println();
+            // System.out.println("Generation: " + generation);
+            // System.out.println("Fitness: " + bestIndividual.getFitness());
+            // bestIndividual.printBoard(generation, bestIndividual.getFitness());
+            // System.out.println();
 
             //cek apakah bestIndividual adalah solusi yang valid
             if(bestIndividual.getFitness() == 0){
                 System.out.println("Solution found in generation " + generation);
                 solutionFound = true;
+                bestIndividual.saveResult(generation, bestIndividual.getFitness());
                 return bestIndividual;
             }
 
@@ -109,6 +110,7 @@ public class YinYang {
         if(!solutionFound) { //solusi valid tidak ditemukan
             System.out.println("No solution found within the maximum generations.");
         }   
+        bestIndividual.saveResult(generation, bestIndividual.getFitness());
         return bestIndividual;
     }
 }
